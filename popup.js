@@ -1,3 +1,20 @@
+var emailIter = 1;
+
+chrome.storage.sync.get('email',(result)=>{
+    document.getElementById("emailInput").value=result.email;
+});
+
+chrome.storage.sync.get('emailIteration',(result)=>{
+    emailIter=result.emailIteration;
+    document.getElementById("emailOutput").value=generateEmailAlternation(document.getElementById("emailInput").value, result.emailIteration-1);
+});
+
+document.getElementById("emailInput").addEventListener("change",()=>{
+    chrome.storage.sync.set({'email': document.getElementById("emailInput").value},()=>{});
+    document.getElementById("emailOutput").value=document.getElementById("emailInput").value+"@gmail.com";
+    emailIter=1;
+});
+
 const generateEmailAlternation = (email, alternationNumber) =>{
     let str = convertDecToBin(alternationNumber);
     let temp = str.length;
@@ -16,15 +33,16 @@ const convertDecToBin = (number) =>{
     return number.toString(2);
 }
 
-var n = 1;
+
 const nextEmail = () =>{
-    if(n<=Math.pow(2, document.getElementById("emailInput").value.length-1)-1)
-        document.getElementById("emailOutput").value=generateEmailAlternation(document.getElementById("emailInput").value, n);
+    if(emailIter<=Math.pow(2, document.getElementById("emailInput").value.length-1)-1)
+        document.getElementById("emailOutput").value=generateEmailAlternation(document.getElementById("emailInput").value, emailIter);
     else{
         alert("Emails are over!");
-        n=0;
+        emailIter=0;
     }
-    n++;
+    emailIter++;
+    chrome.storage.sync.set({'emailIteration': emailIter},()=>{});
 }
 
 const copyEmail = () =>{
